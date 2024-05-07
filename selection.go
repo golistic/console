@@ -12,18 +12,22 @@ import (
 )
 
 type selectionTheme struct {
-	unselected string
-	selected   string
+	Unselected string
+	Selected   string
 }
 
 var selectionThemes = map[string]selectionTheme{
 	"nerdfont": {
-		unselected: "\uEBB5 ",
-		selected:   "\u001B[32m\uF058 \u001B[0m",
+		Unselected: "\uEBB5 %s",
+		Selected:   "\u001B[32m\uF058 \u001B[0m%s",
+	},
+	"color01": {
+		Unselected: "\u001B[47;30m%s\u001B[0m",   // BG:LightGrey FG:Black
+		Selected:   "\u001B[1;42;30m%s\u001B[0m", // BG:Green FG:White
 	},
 	"ascii": {
-		unselected: " ",
-		selected:   ">",
+		Unselected: "  %s",
+		Selected:   "> %s",
 	},
 }
 
@@ -36,7 +40,7 @@ func NewSelection[V ~[]E, E any](options []string, values V) (*Selection[E], err
 	s := &Selection[E]{
 		values:  values,
 		options: options,
-		theme:   selectionThemes["ascii"],
+		theme:   selectionThemes[defaultTheme],
 	}
 
 	s.SetShowing(0) // adapt to terminal height
@@ -215,10 +219,13 @@ func (s *Selection[E]) renderOptions(theme selectionTheme, options []string, dir
 	}
 
 	for i := s.start; i < s.end; i++ {
+
 		if i == s.pointer {
-			fmt.Printf("\r\033[2K%s %s\n", theme.selected, options[i])
+			fmt.Printf("\r\033[2K %s\n",
+				fmt.Sprintf(theme.Selected, options[i]))
 		} else {
-			fmt.Printf("\r\033[2K%s %s\n", theme.unselected, options[i])
+			fmt.Printf("\r\033[2K %s\n",
+				fmt.Sprintf(theme.Unselected, options[i]))
 		}
 	}
 }

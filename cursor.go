@@ -12,10 +12,14 @@ const (
 	directionNone Direction = iota
 	directionUp   Direction = iota
 	directionDown
+	directionLeft
+	directionRight
 )
 
-var cursorUp = string([]byte{27, 91, 65})
-var cursorDown = string([]byte{27, 91, 66})
+var cursorUp = string([]byte{27, 91, 'A'})
+var cursorDown = string([]byte{27, 91, 'B'})
+var cursorRight = string([]byte{27, 91, 'C'})
+var cursorLeft = string([]byte{27, 91, 'D'})
 
 func hideCursor() {
 	fmt.Print("\033[?25l")
