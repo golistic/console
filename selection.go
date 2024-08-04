@@ -21,6 +21,10 @@ var selectionThemes = map[string]selectionTheme{
 		Unselected: "\uEBB5 %s",
 		Selected:   "\u001B[32m\uF058 \u001B[0m%s",
 	},
+	"inverted": {
+		Unselected: "%s",
+		Selected:   "\u001B[7m%s\u001B[0m", // inverted
+	},
 	"color01": {
 		Unselected: "\u001B[47;30m%s\u001B[0m",   // BG:LightGrey FG:Black
 		Selected:   "\u001B[1;42;30m%s\u001B[0m", // BG:Green FG:White
