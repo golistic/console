@@ -53,6 +53,8 @@ The above will adapt by default to the height of the terminal, but you can use `
 Supported themes:
 - `ascii`: simple, and works everywhere
 - `nerdfont`: you need to use [Nerd Font in your terminal][1]
+- `color01`: uses color LightGrey/Green for background/foreground
+- `inverted`: inverts the back/foreground color that the terminal is using
 
 
 License
