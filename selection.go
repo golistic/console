@@ -26,7 +26,7 @@ var selectionThemes = map[string]selectionTheme{
 		Selected:   "\u001B[1;42;30m%s\u001B[0m", // BG:Green FG:White
 	},
 	"ascii": {
-		Unselected: "  %s",
+		Unselected: "   %s",
 		Selected:   "> %s",
 	},
 }
