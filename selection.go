@@ -148,18 +148,21 @@ func (s *Selection[E]) render(theme selectionTheme) error {
 
 	s.renderOptions(theme, s.options, directionNone)
 
+	var done bool
 	for {
+		if done {
+			break
+		}
 		b := make([]byte, 3)
 		if _, err := os.Stdin.Read(b); err != nil {
 			return fmt.Errorf("reading input (%w)", err)
 		}
 
-		if b[0] == 10 || b[0] == 13 {
+		switch {
+		case b[0] == 10 || b[0] == 13:
 			s.selectedOption = s.values[s.pointer]
-			break
-		}
-
-		if b[0] == 27 && b[1] == 91 {
+			done = true
+		case b[0] == 27 && b[1] == 91:
 			var direction Direction
 
 			switch b[2] {
@@ -177,6 +180,8 @@ func (s *Selection[E]) render(theme selectionTheme) error {
 				}
 				s.renderOptions(theme, s.options, direction)
 			}
+		case b[0] == 3 || b[0] == 27:
+			return ErrCancelled
 		}
 	}
 

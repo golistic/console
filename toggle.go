@@ -90,9 +90,6 @@ func (tg *Toggle[T]) Render() error {
 	defer func() {
 		_ = term.Restore(int(os.Stdin.Fd()), oldState)
 
-		fmt.Print(cursorUp)
-		fmt.Print("\r\033[2K")
-
 		fmt.Print("\r\033[2K")
 		showCursor()
 	}()
@@ -100,18 +97,21 @@ func (tg *Toggle[T]) Render() error {
 	hideCursor()
 	tg.renderOptions(tg.theme, tg.options)
 
+	var done bool
 	for {
+		if done {
+			break
+		}
 		b := make([]byte, 3)
 		if _, err := os.Stdin.Read(b); err != nil {
 			return fmt.Errorf("reading input (%w)", err)
 		}
 
-		if b[0] == 10 || b[0] == 13 {
+		switch {
+		case b[0] == 10 || b[0] == 13:
 			tg.selectedOption = tg.values[tg.pointer]
-			break
-		}
-
-		if b[0] == 27 && b[1] == 91 {
+			done = true
+		case b[0] == 27 && b[1] == 91:
 			switch b[2] {
 			case cursorLeft[2]:
 				tg.pointer = 0
@@ -120,6 +120,8 @@ func (tg *Toggle[T]) Render() error {
 			}
 
 			tg.renderOptions(tg.theme, tg.options)
+		case b[0] == 3 || b[0] == 27:
+			return ErrCancelled
 		}
 	}
 

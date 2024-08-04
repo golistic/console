@@ -5,6 +5,7 @@
 package main
 
 import (
+	"errors"
 	"flag"
 	"fmt"
 	"log"
@@ -18,17 +19,29 @@ func main() {
 	flag.StringVar(&theme, "theme", "ascii", "Theme to use")
 	flag.Parse()
 
+	if len(flag.Args()) == 0 {
+		fmt.Println("Usage: demo [-theme=<theme>] [toggle|selection]")
+	}
+
 	for _, what := range flag.Args() {
+		var err error
 		switch what {
 		case "toggle":
-			toggle(theme)
+			err = toggle(theme)
 		case "selection":
-			selection(theme)
+			err = selection(theme)
+		}
+
+		switch {
+		case errors.Is(err, console.ErrCancelled):
+			fmt.Println("Cancelled")
+		case err != nil:
+			fmt.Println("Error:", err)
 		}
 	}
 }
 
-func toggle(theme string) {
+func toggle(theme string) error {
 
 	options := []string{"Absolutely!", "No.."}
 	values := []bool{true, false}
@@ -41,13 +54,14 @@ func toggle(theme string) {
 	tg.SetTheme(theme)
 
 	if err := tg.Render(); err != nil {
-		log.Fatal(err)
+		return err
 	}
 
 	fmt.Printf("%s %v\n", tg.Label(), tg.Selected())
+	return nil
 }
 
-func selection(theme string) {
+func selection(theme string) error {
 
 	var options []string
 	var values []int
@@ -67,8 +81,9 @@ func selection(theme string) {
 	s.SetShowing(6)
 
 	if err := s.RenderWithTheme(theme); err != nil {
-		log.Fatal(err)
+		return err
 	}
 
 	fmt.Println("Selected:", s.Selected())
+	return nil
 }
