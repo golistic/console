@@ -28,3 +28,11 @@ func hideCursor() {
 func showCursor() {
 	fmt.Print("\033[?25h")
 }
+
+// ClearLines clears the specified number of lines in the console.
+func ClearLines(n int) {
+
+	for i := 0; i < n; i++ {
+		fmt.Print("\u001B[1A\u001B[K")
+	}
+}
