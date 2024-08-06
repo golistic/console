@@ -41,20 +41,21 @@ var toggleThemes = map[string]toggleTheme{
 	},
 }
 
-const defaultTheme = "ascii"
-
 func NewToggle[V ~[]T, T any](label string, options []string, values V) (*Toggle[T], error) {
 
 	if len(options) != 2 || len(options) != len(values) {
 		return nil, fmt.Errorf("number of options and values must be 2")
 	}
 
-	return &Toggle[T]{
+	toggle := &Toggle[T]{
 		label:   label,
 		options: options,
 		values:  values,
-		theme:   toggleThemes[defaultTheme],
-	}, nil
+	}
+
+	toggle.SetTheme(defaultTheme)
+
+	return toggle, nil
 }
 
 type Toggle[T any] struct {
@@ -71,7 +72,12 @@ type Toggle[T any] struct {
 
 func (tg *Toggle[E]) SetTheme(name string) {
 
-	tg.theme = toggleThemes[name]
+	theme, ok := toggleThemes[name]
+	if !ok {
+		theme = tg.theme
+	}
+
+	tg.theme = theme
 }
 
 // Selected returns the currently toggled option.
@@ -84,7 +90,24 @@ func (tg *Toggle[T]) Label() string {
 	return tg.label
 }
 
+// RenderWithTheme renders the Selection with the specified theme. If the theme with the given
+// name does not exist, the default theme of the Selection is used.
+func (tg *Toggle[T]) RenderWithTheme(themeName string) error {
+
+	theme, ok := toggleThemes[themeName]
+	if !ok {
+		theme = tg.theme
+	}
+
+	return tg.render(theme)
+}
+
+// Render renders the Selection.
 func (tg *Toggle[T]) Render() error {
+	return tg.render(tg.theme)
+}
+
+func (tg *Toggle[T]) render(theme toggleTheme) error {
 
 	tg.pointer = 0
 
@@ -124,7 +147,7 @@ func (tg *Toggle[T]) Render() error {
 				tg.pointer = 1
 			}
 
-			tg.renderOptions(tg.theme, tg.options)
+			tg.renderOptions(theme, tg.options)
 		case b[0] == 3 || b[0] == 27:
 			return ErrCancelled
 		}

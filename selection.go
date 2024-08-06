@@ -44,9 +44,9 @@ func NewSelection[V ~[]E, E any](options []string, values V) (*Selection[E], err
 	s := &Selection[E]{
 		values:  values,
 		options: options,
-		theme:   selectionThemes[defaultTheme],
 	}
 
+	s.SetTheme(defaultTheme)
 	s.SetShowing(len(options))
 
 	return s, nil
@@ -75,7 +75,12 @@ type Selection[E any] struct {
 
 func (s *Selection[E]) SetTheme(name string) {
 
-	s.theme = selectionThemes[name]
+	theme, ok := selectionThemes[name]
+	if !ok {
+		theme = s.theme
+	}
+
+	s.theme = theme
 }
 
 // Selected returns the currently selected option from the Selection.
