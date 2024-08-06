@@ -32,7 +32,7 @@ func showCursor() {
 // ClearLines clears the specified number of lines in the console.
 func ClearLines(n int) {
 
-	for i := 0; i < n; i++ {
-		fmt.Print("\u001B[1A\u001B[K")
+	for i := 0; i < n-1; i++ {
+		fmt.Print("\u001B[1A\u001B[1G\u001B[2K")
 	}
 }

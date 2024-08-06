@@ -47,7 +47,7 @@ func NewSelection[V ~[]E, E any](options []string, values V) (*Selection[E], err
 		theme:   selectionThemes[defaultTheme],
 	}
 
-	s.SetShowing(0) // adapt to terminal height
+	s.SetShowing(len(options))
 
 	return s, nil
 }
@@ -67,7 +67,8 @@ type Selection[E any] struct {
 	start   int
 	end     int
 
-	selectedOption E
+	selectedValue  E
+	selectedOption string
 
 	theme selectionTheme
 }
@@ -80,6 +81,11 @@ func (s *Selection[E]) SetTheme(name string) {
 // Selected returns the currently selected option from the Selection.
 func (s *Selection[E]) Selected() E {
 
+	return s.selectedValue
+}
+
+// SelectedOption returns the currently selected option from the Selection.
+func (s *Selection[E]) SelectedOption() string {
 	return s.selectedOption
 }
 
@@ -88,23 +94,13 @@ func (s *Selection[E]) Selected() E {
 // Otherwise, it sets the number of options to n.
 func (s *Selection[E]) SetShowing(n int) {
 
-	if n < 1 {
-		_, s.showing = s.terminalSize()
-		s.showing -= 3
+	_, height := TerminalSize()
+
+	if n < 1 || n > height-3 {
+		s.showing = height - 3
 	} else {
 		s.showing = n
 	}
-}
-
-func (s *Selection[E]) terminalSize() (int, int) {
-
-	fd := int(os.Stdout.Fd())
-	width, height, err := term.GetSize(fd)
-	if err != nil {
-		return 80, 24
-	}
-
-	return width, height
 }
 
 // RenderWithTheme renders the Selection with the specified theme. If the theme with the given
@@ -135,12 +131,7 @@ func (s *Selection[E]) render(theme selectionTheme) error {
 	defer func() {
 		_ = term.Restore(int(os.Stdin.Fd()), oldState)
 
-		for i := 0; i < s.showing; i++ {
-			fmt.Print(cursorUp)
-			fmt.Print("\r\033[2K")
-		}
-
-		fmt.Print("\r\033[2K")
+		ClearLines(s.showing + 1)
 		showCursor()
 	}()
 
@@ -164,7 +155,8 @@ func (s *Selection[E]) render(theme selectionTheme) error {
 
 		switch {
 		case b[0] == 10 || b[0] == 13:
-			s.selectedOption = s.values[s.pointer]
+			s.selectedValue = s.values[s.pointer]
+			s.selectedOption = s.options[s.pointer]
 			done = true
 		case b[0] == 27 && b[1] == 91:
 			var direction Direction
