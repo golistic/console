@@ -18,23 +18,23 @@ type toggleTheme struct {
 	Gap        int
 }
 
-var toggleThemes = map[string]toggleTheme{
-	"nerdfont": {
+var toggleThemes = map[Theme]toggleTheme{
+	ThemeNerdFont: {
 		Unselected: "\uEBB5 %s",
 		Selected:   "\u001B[32m\uF058 \u001B[0m%s",
 		Gap:        1,
 	},
-	"inverted": {
+	ThemeInverted: {
 		Unselected: "%s",
 		Selected:   "\u001B[7m%s\u001B[0m", // inverted
 		Gap:        1,
 	},
-	"color01": {
+	ThemeColor01: {
 		Unselected: "\u001B[47;30m%s\u001B[0m",   // BG:LightGrey FG:Black
 		Selected:   "\u001B[1;42;30m%s\u001B[0m", // BG:Green FG:White
 		Gap:        1,
 	},
-	"ascii": {
+	ThemeAscii: {
 		Unselected: "  %s",
 		Selected:   "> %s",
 		Gap:        2,
@@ -70,9 +70,9 @@ type Toggle[T any] struct {
 	gap   int
 }
 
-func (tg *Toggle[E]) SetTheme(name string) {
+func (tg *Toggle[E]) SetTheme(t Theme) {
 
-	theme, ok := toggleThemes[name]
+	theme, ok := toggleThemes[t]
 	if !ok {
 		theme = tg.theme
 	}
@@ -92,9 +92,9 @@ func (tg *Toggle[T]) Label() string {
 
 // RenderWithTheme renders the Selection with the specified theme. If the theme with the given
 // name does not exist, the default theme of the Selection is used.
-func (tg *Toggle[T]) RenderWithTheme(themeName string) error {
+func (tg *Toggle[T]) RenderWithTheme(t Theme) error {
 
-	theme, ok := toggleThemes[themeName]
+	theme, ok := toggleThemes[t]
 	if !ok {
 		theme = tg.theme
 	}

@@ -16,20 +16,20 @@ type selectionTheme struct {
 	Selected   string
 }
 
-var selectionThemes = map[string]selectionTheme{
-	"nerdfont": {
+var selectionThemes = map[Theme]selectionTheme{
+	ThemeNerdFont: {
 		Unselected: "\uEBB5 %s",
 		Selected:   "\u001B[32m\uF058 \u001B[0m%s",
 	},
-	"inverted": {
+	ThemeInverted: {
 		Unselected: "%s",
 		Selected:   "\u001B[7m%s\u001B[0m", // inverted
 	},
-	"color01": {
+	ThemeColor01: {
 		Unselected: "\u001B[47;30m%s\u001B[0m",   // BG:LightGrey FG:Black
 		Selected:   "\u001B[1;42;30m%s\u001B[0m", // BG:Green FG:White
 	},
-	"ascii": {
+	ThemeAscii: {
 		Unselected: "   %s",
 		Selected:   "> %s",
 	},
@@ -73,9 +73,9 @@ type Selection[E any] struct {
 	theme selectionTheme
 }
 
-func (s *Selection[E]) SetTheme(name string) {
+func (s *Selection[E]) SetTheme(t Theme) {
 
-	theme, ok := selectionThemes[name]
+	theme, ok := selectionThemes[t]
 	if !ok {
 		theme = s.theme
 	}
@@ -110,7 +110,7 @@ func (s *Selection[E]) SetShowing(n int) {
 
 // RenderWithTheme renders the Selection with the specified theme. If the theme with the given
 // name does not exist, the default theme of the Selection is used.
-func (s *Selection[E]) RenderWithTheme(themeName string) error {
+func (s *Selection[E]) RenderWithTheme(themeName Theme) error {
 
 	theme, ok := selectionThemes[themeName]
 	if !ok {

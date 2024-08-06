@@ -9,18 +9,29 @@ import (
 	"flag"
 	"fmt"
 	"log"
+	"os"
 
 	"github.com/golistic/console"
 )
 
 func main() {
-	var theme string
+	var themeArg string
 
-	flag.StringVar(&theme, "theme", "ascii", "Theme to use")
+	flag.StringVar(&themeArg, "theme", "ascii", "Theme to use")
 	flag.Parse()
 
 	if len(flag.Args()) == 0 {
 		fmt.Println("Usage: demo [-theme=<theme>] [toggle|selection]")
+	}
+
+	theme := console.ThemeAscii
+	if themeArg != "" {
+		if t, ok := console.ThemeLookup(themeArg); !ok {
+			fmt.Println("Theme must be one of: ascii, nerdfont, color01, inverted")
+			os.Exit(1)
+		} else {
+			theme = t
+		}
 	}
 
 	for _, what := range flag.Args() {
@@ -41,7 +52,7 @@ func main() {
 	}
 }
 
-func toggle(theme string) error {
+func toggle(theme console.Theme) error {
 
 	options := []string{"Absolutely!", "No.."}
 	values := []bool{true, false}
@@ -61,7 +72,7 @@ func toggle(theme string) error {
 	return nil
 }
 
-func selection(theme string) error {
+func selection(theme console.Theme) error {
 
 	var options []string
 	var values []int
