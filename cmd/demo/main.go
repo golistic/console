@@ -10,6 +10,7 @@ import (
 	"fmt"
 	"log"
 	"os"
+	"strconv"
 
 	"github.com/golistic/console"
 )
@@ -41,6 +42,8 @@ func main() {
 			err = toggle(theme)
 		case "selection":
 			err = selection(theme)
+		case "form":
+			err = useForm(theme)
 		}
 
 		switch {
@@ -96,5 +99,69 @@ func selection(theme console.Theme) error {
 	}
 
 	fmt.Println("Selected:", s.Selected())
+	return nil
+}
+
+func useForm(theme console.Theme) error {
+
+	programmingLanugages := console.SelectProps{
+		Options: []string{"Go", "Python", "TypeScript"},
+		Values:  []any{"Go", "Python", "Typescript"},
+	}
+
+	scanner := func(value any, destination any) error {
+
+		switch dest := destination.(type) {
+		case *string:
+			if v, ok := value.(string); !ok {
+				return fmt.Errorf("expected string value")
+			} else {
+				*dest = v
+			}
+		case *int:
+			switch v := value.(type) {
+			case int:
+				*dest = v
+			case string:
+				if n, err := strconv.Atoi(v); err != nil {
+					return fmt.Errorf("expected int value")
+				} else {
+					*dest = n
+				}
+			default:
+				return fmt.Errorf("expected string or int value")
+			}
+		default:
+			return fmt.Errorf("unsupported type (was %T)", destination)
+		}
+
+		return nil
+	}
+
+	form := console.NewFormWithScanner(scanner).SetTheme(theme)
+
+	var name string
+	var favLang string
+	var yearExp int
+
+	form.AddElements(
+		console.NewFormInput("name", "Your name", &name).AddValidator(func(value any) error {
+			if name, ok := value.(string); !ok || len(name) == 0 {
+				return errors.New("name is required")
+			}
+			return nil
+		}),
+		console.NewFormSelect("favLang", "Favorite language", &favLang, programmingLanugages),
+		console.NewFormInput("yearExp", "Years Experience", &yearExp),
+	)
+
+	if err := form.Execute(); err != nil {
+		return err
+	}
+
+	form.Clear()
+
+	fmt.Printf("Hi %s! Your favorite language is %s and you have %d year(s) experience.\n",
+		name, favLang, yearExp)
 	return nil
 }
