@@ -182,7 +182,7 @@ func (s *Selection[E]) render(theme selectionTheme) error {
 				s.renderOptions(theme, s.options, direction)
 			}
 		case b[0] == 3 || b[0] == 27:
-			return ErrCancelled
+			return ErrAborted
 		}
 	}
 

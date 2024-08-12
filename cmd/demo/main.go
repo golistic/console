@@ -44,7 +44,7 @@ func main() {
 		}
 
 		switch {
-		case errors.Is(err, console.ErrCancelled):
+		case errors.Is(err, console.ErrAborted):
 			fmt.Println("Cancelled")
 		case err != nil:
 			fmt.Println("Error:", err)

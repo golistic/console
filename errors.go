@@ -7,5 +7,5 @@ package console
 import "errors"
 
 var (
-	ErrCancelled = errors.New("canceled")
+	ErrAborted = errors.New("aborted")
 )

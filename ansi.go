@@ -33,6 +33,7 @@ func showCursor() {
 func ClearLines(n int) {
 
 	for i := 0; i < n-1; i++ {
+		// move cursor 1 up, move to beginning of line, erase the whole line
 		fmt.Print("\u001B[1A\u001B[1G\u001B[2K")
 	}
 }

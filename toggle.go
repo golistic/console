@@ -149,7 +149,7 @@ func (tg *Toggle[T]) render(theme toggleTheme) error {
 
 			tg.renderOptions(theme, tg.options)
 		case b[0] == 3 || b[0] == 27:
-			return ErrCancelled
+			return ErrAborted
 		}
 	}
 
