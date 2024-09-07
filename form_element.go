@@ -4,6 +4,15 @@
 
 package console
 
+type DefaultValueProps struct {
+	SelectOption any
+}
+
+type DefaultValue struct {
+	Value any
+	Found bool
+}
+
 type FormElementer interface {
 	setForm(*Form)
 	do() error
@@ -12,16 +21,20 @@ type FormElementer interface {
 	Label() string
 	Name() string
 	Value() any
+	DefaultValue(func(props *DefaultValueProps) DefaultValue) FormElementer
+
 	AddValidator(func(value any) error) FormElementer
 }
 
 type formElement struct {
-	name       string
-	label      string
-	dest       any
-	value      any
-	form       *Form
-	validators []func(value any) error
+	name  string
+	label string
+	dest  any
+	value any
+	form  *Form
+
+	defaultValue func(props *DefaultValueProps) DefaultValue
+	validators   []func(value any) error
 }
 
 var _ FormElementer = (*formElement)(nil)
@@ -59,4 +72,9 @@ func (fe *formElement) Name() string {
 func (fe *formElement) AddValidator(f func(value any) error) FormElementer {
 
 	panic("need to implement AddValidator")
+}
+
+func (fe *formElement) DefaultValue(f func(props *DefaultValueProps) DefaultValue) FormElementer {
+
+	panic("need to implement DefaultValue")
 }

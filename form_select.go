@@ -9,9 +9,10 @@ import (
 )
 
 type SelectProps struct {
-	Options []string
-	Values  []any
-	Showing int
+	Options  []string
+	Values   []any
+	Showing  int
+	Selected func(value any) bool
 }
 
 func NewFormSelect(name, label string, dest any, props SelectProps) *FormSelect {
@@ -46,6 +47,15 @@ func (fs *FormSelect) do() error {
 		return err
 	}
 
+	if fs.defaultValue != nil {
+		for p, v := range fs.props.Values {
+			if fs.defaultValue(&DefaultValueProps{SelectOption: v}).Found {
+				selection.SetSelected(p)
+				break
+			}
+		}
+	}
+
 	if fs.props.Showing > 0 {
 		selection.SetShowing(fs.props.Showing)
 	}
@@ -72,6 +82,13 @@ func (fs *FormSelect) do() error {
 func (fs *FormSelect) AddValidator(f func(value any) error) FormElementer {
 
 	fs.validators = append(fs.validators, f)
+
+	return fs
+}
+
+func (fs *FormSelect) DefaultValue(f func(props *DefaultValueProps) DefaultValue) FormElementer {
+
+	fs.defaultValue = f
 
 	return fs
 }
