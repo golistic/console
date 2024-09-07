@@ -108,6 +108,17 @@ func (s *Selection[E]) SetShowing(n int) {
 	}
 }
 
+func (s *Selection[E]) SetSelected(p int) {
+
+	if p >= len(s.options) {
+		p = len(s.options) - 1
+	} else if p < 0 {
+		p = 0
+	}
+
+	s.pointer = p
+}
+
 // RenderWithTheme renders the Selection with the specified theme. If the theme with the given
 // name does not exist, the default theme of the Selection is used.
 func (s *Selection[E]) RenderWithTheme(themeName Theme) error {
@@ -127,7 +138,9 @@ func (s *Selection[E]) Render() error {
 
 func (s *Selection[E]) render(theme selectionTheme) error {
 
-	s.pointer = 0
+	if s.pointer < 0 || s.pointer >= len(s.options) {
+		s.pointer = 0
+	}
 
 	oldState, err := term.MakeRaw(int(os.Stdin.Fd()))
 	if err != nil {
