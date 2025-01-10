@@ -6,13 +6,17 @@ package console
 
 import (
 	"fmt"
+	"strings"
 )
 
 type SelectProps struct {
-	Options  []string
-	Values   []any
-	Showing  int
-	Selected func(value any) bool
+	Options          []string
+	Values           []any
+	Showing          int
+	Selected         func(value any) bool
+	InfoText         string
+	OptionsAndValues func() ([]string, []any, error)
+	Callback         func(value any) string
 }
 
 func NewFormSelect(name, label string, dest any, props SelectProps) *FormSelect {
@@ -41,6 +45,20 @@ func (fs *FormSelect) setForm(form *Form) {
 }
 
 func (fs *FormSelect) do() error {
+
+	if fs.props.OptionsAndValues != nil {
+		var err error
+		fs.props.Options, fs.props.Values, err = fs.props.OptionsAndValues()
+		if err != nil {
+			return err
+		}
+	}
+
+	var clearLines int
+	if fs.props.InfoText != "" {
+		fmt.Println(fs.props.InfoText)
+		clearLines = 1 + strings.Count(fs.props.InfoText, "\n")
+	}
 
 	selection, err := NewSelection(fs.props.Options, fs.props.Values)
 	if err != nil {
@@ -72,9 +90,7 @@ func (fs *FormSelect) do() error {
 		}
 	}
 
-	fmt.Printf("%-*s: %v\n", fs.form.maxLengthLabel, fs.label, selection.SelectedOption())
-
-	fs.form.shownLines += 1
+	fs.form.shownLines += clearLines
 
 	return nil
 }
@@ -91,4 +107,14 @@ func (fs *FormSelect) DefaultValue(f func(props *DefaultValueProps) DefaultValue
 	fs.defaultValue = f
 
 	return fs
+}
+
+func (fs *FormSelect) Callback() {
+	if fs.props.Callback != nil {
+		if fs.props.InfoText != "" {
+			ClearLines(2 + strings.Count(fs.props.InfoText, "\n"))
+		}
+
+		fmt.Println(fs.props.Callback(fs.value))
+	}
 }

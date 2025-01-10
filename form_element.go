@@ -26,6 +26,10 @@ type FormElementer interface {
 	AddValidator(func(value any) error) FormElementer
 }
 
+type FormCallbacker interface {
+	Callback()
+}
+
 type formElement struct {
 	name  string
 	label string

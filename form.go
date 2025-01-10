@@ -58,6 +58,10 @@ func (f *Form) Execute() error {
 				return err
 			}
 		}
+
+		if fb, ok := element.(FormCallbacker); ok {
+			fb.Callback()
+		}
 	}
 
 	return nil
