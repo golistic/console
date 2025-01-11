@@ -41,7 +41,7 @@ var toggleThemes = map[Theme]toggleTheme{
 	},
 }
 
-func NewToggle[V ~[]T, T any](label string, options []string, values V) (*Toggle[T], error) {
+func NewToggle[V ~[]T, T comparable](label string, options []string, values V) (*Toggle[T], error) {
 
 	if len(options) != 2 || len(options) != len(values) {
 		return nil, fmt.Errorf("number of options and values must be 2")
@@ -58,7 +58,7 @@ func NewToggle[V ~[]T, T any](label string, options []string, values V) (*Toggle
 	return toggle, nil
 }
 
-type Toggle[T any] struct {
+type Toggle[T comparable] struct {
 	label   string
 	options []string
 	values  []T
@@ -86,6 +86,16 @@ func (tg *Toggle[T]) Selected() T {
 	return tg.selectedOption
 }
 
+func (tg *Toggle[T]) SetSelected(value T) {
+
+	for i, v := range tg.values {
+		if v == value {
+			tg.pointer = i
+			break
+		}
+	}
+}
+
 func (tg *Toggle[T]) Label() string {
 	return tg.label
 }
@@ -108,8 +118,6 @@ func (tg *Toggle[T]) Render() error {
 }
 
 func (tg *Toggle[T]) render(theme toggleTheme) error {
-
-	tg.pointer = 0
 
 	oldState, err := term.MakeRaw(int(os.Stdin.Fd()))
 	if err != nil {

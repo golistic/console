@@ -6,6 +6,7 @@ package console
 
 type DefaultValueProps struct {
 	SelectOption any
+	ToggleOption any
 }
 
 type DefaultValue struct {
